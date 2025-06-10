@@ -227,7 +227,14 @@ class JsonToMd:
     @rule
     def block_paragraph(self, value, prv=None, nxt=None):
         if isinstance(value, dict) and value.get("type", "") == "paragraph":
-            return f"{self.json2md(value['paragraph']['rich_text'])}\n"
+            lines = [f"{self.json2md(value['paragraph']['rich_text'])}\n"]
+            indent = (self.config or {}).get("block_paragraph", {}).get("indent", "    ")
+            # Handle nested blocks
+            if value["has_children"]:
+                sub = self.jsons2md(value["children"])
+                lines.extend([f"{indent}{line}" for line in sub.splitlines()])
+                lines.append("")  # Add spacing after nested blocks
+            return "\n".join(lines)
         return noop
 
     @rule
