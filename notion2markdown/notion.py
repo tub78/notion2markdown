@@ -1,7 +1,7 @@
 from datetime import datetime
 from pathlib import Path
 import json
-from itertools import chain
+#  from itertools import chain
 from typing import List, Union, Optional
 from .utils import logger, normalize_id
 
@@ -94,9 +94,10 @@ class NotionClient:
     def get_blocks(self, block_id: int) -> List:
         """Get all page blocks as json. Recursively fetches descendants."""
         blocks = []
-        for child in chain(
-            *paginate(self.client.blocks.children.list, block_id=block_id)
-        ):
+        #  for child in chain(
+        #      *paginate(self.client.blocks.children.list, block_id=block_id)
+        #  ):
+        for child in paginate(self.client.blocks.children.list, block_id=block_id):
             child["children"] = (
                 list(self.get_blocks(child["id"])) if child["has_children"] else []
             )
@@ -116,4 +117,4 @@ class NotionClient:
                 self.client.databases.query,
                 database_id=database_id,
             )
-        return list(self.transformer.forward(chain(*results)))
+        return list(self.transformer.forward(results))
