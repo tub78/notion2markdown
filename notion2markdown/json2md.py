@@ -48,29 +48,29 @@ class JsonToMdConverter:
         md_dir = Path(md_dir)
         md_dir.mkdir(parents=True, exist_ok=True)
 
-        with open(json_dir / "database.json") as f:
+        with open(json_dir / "database.json") as fin:
             page_id_to_metadata = {
-                page["id"]: self.get_post_metadata(page) for page in json.load(f)
+                page["id"]: self.get_post_metadata(page) for page in json.load(fin)
             }
 
         paths = [
             path for path in glob.glob(str(json_dir / "*.json"))
             if Path(path).name != "database.json"
         ]
-        for path in paths:
-            with open(path) as f:
-                blocks = json.load(f)
-                page_id = Path(path).stem
-                path = md_dir / f"{page_id}.{self.extention}"
+        for in_path in paths:
+            with open(in_path) as fin:
+                blocks = json.load(fin)
+                page_id = Path(in_path).stem
+                out_path = md_dir / f"{page_id}.{self.extention}"
                 if page_id not in page_id_to_metadata:  # page has been deleted
                     continue
                 metadata = page_id_to_metadata[page_id]
                 markdown = JsonToMd(metadata).page2md(blocks)
-                with open(path, "w", encoding='utf-8') as f:
-                    f.write(markdown)
+                with open(out_path, "w", encoding='utf-8') as fout:
+                    fout.write(markdown)
 
                 if len(paths) == 1:
-                    return path
+                    return out_path
 
         return md_dir
 
