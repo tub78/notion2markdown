@@ -225,19 +225,18 @@ class JsonToMd:
         if isinstance(value, dict) and value.get("type", "").startswith("heading"):
             for i in range(6):
                 if value["type"] == f"heading_{i + 1}":
-                    return f"{'#' * (i + 1)} {self.json2md(value['heading_' + str(i + 1)]['rich_text'])}\n"
+                    return f"{'#' * (i + 1)} {self.json2md(value['heading_' + str(i + 1)]['rich_text'])}"
         return noop
 
     @rule
     def block_paragraph(self, value, prv=None, nxt=None):
         if isinstance(value, dict) and value.get("type", "") == "paragraph":
-            lines = [f"{self.json2md(value['paragraph']['rich_text'])}\n"]
+            lines = [f"{self.json2md(value['paragraph']['rich_text'])}"]
             indent = (self.config or {}).get("block_paragraph", {}).get("indent", "    ")
             # Handle nested blocks
             if value["has_children"]:
                 sub = self.jsons2md(value["children"])
                 lines.extend([f"{indent}{line}" for line in sub.splitlines()])
-                lines.append("")  # Add spacing after nested blocks
             return "\n".join(lines)
         return noop
 
@@ -301,7 +300,6 @@ class JsonToMd:
             if value["has_children"]:
                 sub = self.jsons2md(value["children"])
                 lines.extend([f"{indent}{line}" for line in sub.splitlines()])
-                lines.append("")  # Add spacing after nested list
 
             # If the next block is not a list, reset numbered list state
             if not (nxt and isinstance(nxt, dict) and nxt.get("type") in ("numbered_list_item", "bulleted_list_item")):
@@ -370,7 +368,6 @@ class JsonToMd:
                     + "|".join([self.json2md(cell[0]) for cell in row])
                     + "|"
                 )
-            lines.append("")
             return "\n".join(lines)
         return noop
 
@@ -479,7 +476,7 @@ class JsonToMd:
             prv = blocks[i - 1] if i > 0 else None
             nxt = blocks[i + 1] if i + 1 < len(blocks) else None
             if (md := self.json2md(cur, prv, nxt)) is not noop:
-                result += "\n" + md
+                result += md + "\n"
             else:
                 raise NotImplementedError(f"Unsupported block type: {cur['type']}")
 
