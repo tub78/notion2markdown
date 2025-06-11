@@ -61,9 +61,13 @@ class JsonToMdConverter:
             page_id = Path(in_path).stem
             if page_id not in page_id_to_metadata:  # page has been deleted
                 continue
+            # output path
+            out_path = md_dir / f"{page_id}.{self.extention}"
+            # check if out_path exists and is newer than in_path
+            if Path(out_path).exists() and Path(out_path).stat().st_mtime > Path(in_path).stat().st_mtime:
+                continue
             with open(in_path) as fin:
                 blocks = json.load(fin)
-                out_path = md_dir / f"{page_id}.{self.extention}"
                 metadata = page_id_to_metadata[page_id]
                 markdown = JsonToMd(metadata).page2md(blocks)
                 with open(out_path, "w", encoding='utf-8') as fout:
