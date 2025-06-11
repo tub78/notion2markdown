@@ -2,6 +2,7 @@ from collections import defaultdict
 from datetime import datetime
 import glob
 import json
+import copy
 from pathlib import Path
 from typing import List, Union
 from .utils import normalize_id, get_whitespace
@@ -300,7 +301,12 @@ class JsonToMd:
             if value["has_children"]:
                 # <4-spaces, otherwise converts to comment block
                 indent = (self.config or {}).get("block_item", {}).get("indent", "   ")
+                # save / make deep copy of state variables
+                tmp_state = copy.deepcopy(self.state)
+                self.state.pop("active_numbered_list", None) # Reset active numbered list state
+                self.state.pop("numbered_list_counter", None) # Reset numbered list counter
                 sub = self.jsons2md(value["children"])
+                self.state = tmp_state
                 lines.extend([f"{indent}{line}" for line in sub.splitlines()])
 
             # If the next block is not a list, reset numbered list state
