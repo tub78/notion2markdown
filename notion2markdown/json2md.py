@@ -307,11 +307,12 @@ class JsonToMd:
             if value["has_children"]:
                 # <4-spaces, otherwise converts to comment block
                 indent = (self.config or {}).get("block_item", {}).get("indent", "   ")
-                # save / make deep copy of state variables
+                # save / make deep copy of state
                 tmp_state = copy.deepcopy(self.state)
                 self.state.pop("active_numbered_list", None) # Reset active numbered list state
                 self.state.pop("numbered_list_counter", None) # Reset numbered list counter
                 sub = self.jsons2md(value["children"])
+                # re-instate saved state
                 self.state = tmp_state
                 lines.extend([f"{indent}{line}" for line in sub.splitlines()])
 
