@@ -354,7 +354,7 @@ class JsonToMd:
             out = f"- [ ] {self.json2md(value['to_do']['rich_text'])}"
             if value["has_children"]:
                 # TODO: indent children
-                out += f"{self.jsons2md(value['children'])}"
+                out += f"\n{self.jsons2md(value['children'])}"
             return '\n'.join(out.splitlines())
         return noop
 
