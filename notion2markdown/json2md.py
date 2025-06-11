@@ -488,8 +488,9 @@ class JsonToMd:
             else:
                 raise NotImplementedError(f"Unsupported block type: {cur['type']}")
 
-            if cur["type"] != (nxt and nxt["type"]):
-                result += "\n"
+            if nxt:
+                if cur["type"] != nxt["type"]:
+                    result += "\n"
 
             if cur["type"] == "callout" and (nxt and nxt["type"] == "callout"):
                 result += '\n<div></div>\n'  # weird property of blockquote parsing: https://stackoverflow.com/a/13066620/4855984
