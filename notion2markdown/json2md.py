@@ -232,9 +232,10 @@ class JsonToMd:
     def block_paragraph(self, value, prv=None, nxt=None):
         if isinstance(value, dict) and value.get("type", "") == "paragraph":
             lines = [f"{self.json2md(value['paragraph']['rich_text'])}"]
-            indent = (self.config or {}).get("block_paragraph", {}).get("indent", "    ")
             # Handle nested blocks
             if value["has_children"]:
+                # <4-spaces, otherwise converts to comment block
+                indent = (self.config or {}).get("block_paragraph", {}).get("indent", "   ")
                 sub = self.jsons2md(value["children"])
                 lines.extend([f"{indent}{line}" for line in sub.splitlines()])
             return "\n".join(lines)
@@ -278,7 +279,6 @@ class JsonToMd:
     @rule
     def block_item(self, value, prv=None, nxt=None):
         if isinstance(value, dict) and value.get("type", "") in ("bulleted_list_item", "numbered_list_item"):
-            indent = (self.config or {}).get("block_item", {}).get("indent", "    ")
 
             # Determine if it's a bulleted or numbered list
             if value["type"] == "bulleted_list_item":
@@ -298,6 +298,8 @@ class JsonToMd:
 
             # Handle nested lists (if children exist)
             if value["has_children"]:
+                # <4-spaces, otherwise converts to comment block
+                indent = (self.config or {}).get("block_item", {}).get("indent", "   ")
                 sub = self.jsons2md(value["children"])
                 lines.extend([f"{indent}{line}" for line in sub.splitlines()])
 
