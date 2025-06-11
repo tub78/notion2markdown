@@ -247,12 +247,14 @@ class JsonToMd:
     def block_callout(self, value, prv=None, nxt=None):
         # Following this convention: https://docs.readme.com/rdmd/docs/callouts (callouts denoted by leading emoji)
         if isinstance(value, dict) and value.get("type", "") == "callout":
-            out = f"{self.json2md(value['callout']['icon'])}"
-            out += f"\n{self.json2md(value['callout']['rich_text'])}"
+            lines = [f"{self.json2md(value['callout']['icon'])}"]
+            lines.append(f"{self.json2md(value['callout']['rich_text'])}")
             if value["has_children"]:
-                # TODO: indent children
-                out += f"\n{self.jsons2md(value['children'])}"
-            return '\n'.join([f"> {line}" for line in out.splitlines()])
+                # <4-spaces, otherwise converts to comment block
+                indent = (self.config or {}).get("block_callout", {}).get("indent", "   ")
+                sub = self.jsons2md(value["children"])
+                lines.extend([f"{indent}{line}" for line in sub.splitlines()])
+            return '\n'.join([f"> {line}" for line in lines])
         return noop
 
     @rule
@@ -341,21 +343,25 @@ class JsonToMd:
     @rule
     def block_quote(self, value, prv=None, nxt=None):
         if isinstance(value, dict) and value.get("type", "") == "quote":
-            out = f"> {self.json2md(value['quote']['rich_text'])}"
+            lines = [f"{self.json2md(value['quote']['rich_text'])}"]
             if value["has_children"]:
-                # TODO: indent children
-                out += f"\n{self.jsons2md(value['children'])}"
-            return '\n> '.join(out.splitlines())
+                # <4-spaces, otherwise converts to comment block
+                indent = (self.config or {}).get("block_quote", {}).get("indent", "   ")
+                sub = self.jsons2md(value["children"])
+                lines.extend([f"{indent}{line}" for line in sub.splitlines()])
+            return '\n'.join([f"> {line}" for line in lines])
         return noop
 
     @rule
     def block_to_do(self, value, prv=None, nxt=None):
         if isinstance(value, dict) and value.get("type", "") == "to_do":
-            out = f"- [ ] {self.json2md(value['to_do']['rich_text'])}"
+            lines = [f"- [ ] {self.json2md(value['to_do']['rich_text'])}"]
             if value["has_children"]:
-                # TODO: indent children
-                out += f"\n{self.jsons2md(value['children'])}"
-            return '\n'.join(out.splitlines())
+                # <4-spaces, otherwise converts to comment block
+                indent = (self.config or {}).get("block_to_do", {}).get("indent", "   ")
+                sub = self.jsons2md(value["children"])
+                lines.extend([f"{indent}{line}" for line in sub.splitlines()])
+            return "\n".join(lines)
         return noop
 
     @rule
@@ -417,12 +423,15 @@ class JsonToMd:
     @rule
     def block_toggle(self, value, prv=None, nxt=None):
         if isinstance(value, dict) and value.get("type", "") == "toggle":
-            out = f"<details>\n<summary>{self.json2md(value['toggle']['rich_text'])}</summary>"
+            lines = ["<details>"]
+            lines.append(f"<summary>{self.json2md(value['toggle']['rich_text'])}</summary>")
             if value["has_children"]:
-                # TODO: indent children
-                out += f"\n{self.jsons2md(value['children'])}"
-            out += "\n</details>"
-            return '\n'.join(out.splitlines())
+                # <4-spaces, otherwise converts to comment block
+                indent = (self.config or {}).get("block_toggle", {}).get("indent", "   ")
+                sub = self.jsons2md(value["children"])
+                lines.extend([f"{indent}{line}" for line in sub.splitlines()])
+            lines.append("</details>")
+            return '\n'.join(lines)
         return noop
 
     @rule
