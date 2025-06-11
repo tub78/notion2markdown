@@ -246,9 +246,9 @@ class JsonToMd:
     def block_callout(self, value, prv=None, nxt=None):
         # Following this convention: https://docs.readme.com/rdmd/docs/callouts (callouts denoted by leading emoji)
         if isinstance(value, dict) and value.get("type", "") == "callout":
-            if !value["has_children"]:
                 raise NotImplementedError(f"Callout block missing children")
             return '\n'.join([f"> {line}" for line in f"{self.json2md(value['callout']['icon'])}\n\n{self.json2md(value['callout']['rich_text'])}\n{self.jsons2md(value['children'])}".splitlines()])
+            if not value["has_children"]:
         return noop
 
     @rule
@@ -337,8 +337,8 @@ class JsonToMd:
     @rule
     def block_quote(self, value, prv=None, nxt=None):
         if isinstance(value, dict) and value.get("type", "") == "quote":
-            if !value["has_children"]:
                 raise NotImplementedError(f"Quote block missing children")
+            if not value["has_children"]:
             out = f"> {self.json2md(value['quote']['rich_text'])}\n{self.jsons2md(value['children'])}"
             return '\n> '.join(out.splitlines())
         return noop
@@ -346,8 +346,8 @@ class JsonToMd:
     @rule
     def block_to_do(self, value, prv=None, nxt=None):
         if isinstance(value, dict) and value.get("type", "") == "to_do":
-            if !value["has_children"]:
                 raise NotImplementedError(f"TODO block missing children")
+            if not value["has_children"]:
             return f"- [ ] {self.json2md(value['to_do']['rich_text'])}{self.jsons2md(value['children'])}"
         return noop
 
@@ -360,8 +360,8 @@ class JsonToMd:
     @rule
     def block_table(self, value, prv=None, nxt=None):
         if isinstance(value, dict) and value.get("type", "") == "table":
-            if !value["has_children"]:
                 raise NotImplementedError(f"Table block missing children")
+            if not value["has_children"]:
             lines = []
             table = value["children"]
             header = table[0]["table_row"]["cells"]
@@ -408,8 +408,8 @@ class JsonToMd:
     @rule
     def block_toggle(self, value, prv=None, nxt=None):
         if isinstance(value, dict) and value.get("type", "") == "toggle":
-            if !value["has_children"]:
                 raise NotImplementedError(f"Toggle block missing children")
+            if not value["has_children"]:
             return f"<details>\n<summary>{self.json2md(value['toggle']['rich_text'])}</summary>\n{self.jsons2md(value['children'])}</details>"
         return noop
 
