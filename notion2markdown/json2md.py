@@ -106,7 +106,8 @@ class JsonToMd:
     @rule
     def apply_href(self, value, prv=None, nxt=None):
         if isinstance(value, dict) and value.get("href"):
-            return f"[{value['plain_text']}]({value['href']})"  # TODO: href and annotations are not exclusive
+            href = value['href'].removeprefix("https://www.notion.so")
+            return f"[{value['plain_text']}]({href})"  # TODO: href and annotations are not exclusive
         return noop
 
     @rule
