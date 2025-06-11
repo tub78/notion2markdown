@@ -58,12 +58,12 @@ class JsonToMdConverter:
             if Path(path).name != "database.json"
         ]
         for in_path in paths:
+            page_id = Path(in_path).stem
+            if page_id not in page_id_to_metadata:  # page has been deleted
+                continue
             with open(in_path) as fin:
                 blocks = json.load(fin)
-                page_id = Path(in_path).stem
                 out_path = md_dir / f"{page_id}.{self.extention}"
-                if page_id not in page_id_to_metadata:  # page has been deleted
-                    continue
                 metadata = page_id_to_metadata[page_id]
                 markdown = JsonToMd(metadata).page2md(blocks)
                 with open(out_path, "w", encoding='utf-8') as fout:
