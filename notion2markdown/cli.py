@@ -66,10 +66,9 @@ def main():
     if only_download:
         path = exporter.download_json(url=args.url)
         logger.info(f"Downloaded to {path} directory")
-        return
-    if only_convert:
+    elif only_convert:
         path = exporter.convert_json(url=args.url)
         logger.info(f"Converted to {path} directory")
-        return
-    path = exporter.export_url(url=args.url)
-    logger.info(f"Exported to {path} directory")
+    else:
+        path = exporter.export_url(url=args.url)
+        logger.info(f"Exported to {path} directory")
