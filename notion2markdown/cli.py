@@ -2,6 +2,7 @@
 from notion2markdown import NotionExporter
 from argparse import ArgumentParser
 from notion2markdown.utils import logger
+import json
 import os
 
 
@@ -19,6 +20,7 @@ def main():
     parser.add_argument('--extension', type=str, help='The file extension to output', default="md")
     parser.add_argument('--strip-meta-chars', type=str, help='Strip characters from frontmatter')
     parser.add_argument('--no-filter', help='Filter for notion export', action="store_true")
+    parser.add_argument('--filter', type=str, help='Filter for notion export, either as json string or as a json file path.  Must contain a valid JSON object.', default=None)
     parser.add_argument('--only-download', help='Stop after downloading json', action="store_true")
     parser.add_argument('--only-convert', help='Skip downloading json', action="store_true")
     args = parser.parse_args()
@@ -29,14 +31,33 @@ def main():
     strip_meta_chars = args.strip_meta_chars
     extension = args.extension
     no_filter = args.no_filter
+    cli_filter = args.filter
     only_download = args.only_download
     only_convert = args.only_convert
 
+    # prevent usage of --filter with --no-filter
+    if no_filter and cli_filter:
+        raise ValueError("Cannot use --filter and --no-filter at the same time")
     # prevent usage of --only-download and --only-convert at the same time
     if only_download and only_convert:
         raise ValueError("Cannot set both --only-download and --only-convert flags")
+
+    # initialize filter
     if no_filter:
         filter = None
+    elif cli_filter:
+        # check if cli_filter is a file path and valid json file
+        if os.path.isfile(cli_filter):
+            with open(cli_filter, 'r') as f:
+                try:
+                    filter = json.load(f)
+                except json.JSONDecodeError:
+                    raise ValueError("Invalid JSON file provided for --filter")
+        else:
+            try:
+                filter = json.loads(cli_filter)
+            except json.JSONDecodeError:
+                raise ValueError("Invalid JSON string provided for --filter")
     else:
         filter = DEFAULT_FILTER
 
