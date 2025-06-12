@@ -104,6 +104,14 @@ class JsonToMd:
         return noop
 
     @rule
+    def block_child_page(self, value, prv=None, nxt=None):
+        if isinstance(value, dict) and value.get("type", "") == "child_page":
+            href = value['id']
+            label = value.get("child_page", {}).get("title", "Untitled")
+            return f"[{label}]({href})"
+        return noop
+
+    @rule
     def apply_href(self, value, prv=None, nxt=None):
         if isinstance(value, dict) and value.get("href"):
             href = value['href'].removeprefix("https://www.notion.so")
