@@ -49,6 +49,13 @@ class NotionDownloader:
         pages = self.notion.get_database(database_id)  # download database
         self.io.save(pages, path)
 
+        # download homepage
+        try: 
+            self.download_page(database_id, out_dir / "homepage.json", False)
+            logger.info(f"Downloaded homepage")
+        except:
+            pass
+
         for cur in pages:  # download individual pages in database IF updated
             if prev.get(cur["id"], datetime(1, 1, 1)) < cur["last_edited_time"]:
                 self.download_page(cur["id"], out_dir / f"{cur['id']}.json", False)

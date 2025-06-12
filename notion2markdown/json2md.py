@@ -49,6 +49,28 @@ class JsonToMdConverter:
         md_dir = Path(md_dir)
         md_dir.mkdir(parents=True, exist_ok=True)
 
+        try: 
+            # convert homepage
+            in_path = json_dir / "homepage.json"
+            out_path = md_dir / f"homepage.{self.extention}"
+            # check if out_path exists and is newer than in_path
+            if Path(in_path).exists():
+                if not Path(out_path).exists() or Path(out_path).stat().st_mtime <= Path(in_path).stat().st_mtime:
+                    with open(in_path) as fin:
+                        blocks = json.load(fin)
+                        today_string = datetime.today().strftime("%Y-%m-%d")
+                        metadata = {
+                            "Last edited time": f"{today_string}",
+                            "Verification": "pwFZ",
+                            "Page": "homepage",
+                            "People involved": "N/A"
+                        }                                
+                        markdown = JsonToMd(metadata).page2md(blocks)
+                        with open(out_path, "w", encoding='utf-8') as fout:
+                            fout.write(markdown)
+        except:
+            pass
+
         with open(json_dir / "database.json") as fin:
             page_id_to_metadata = {
                 page["id"]: self.get_post_metadata(page) for page in json.load(fin)
