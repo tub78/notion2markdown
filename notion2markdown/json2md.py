@@ -413,6 +413,9 @@ class JsonToMd:
             else:
                 url = None
 
+            # If no caption, default to 'none'
+            if not (isinstance(caption, str) and caption.strip()):
+                caption_mode = 'none'
             if caption_mode == 'alt':
                 return f"![{caption}]({url})"
             elif caption_mode == 'em':
