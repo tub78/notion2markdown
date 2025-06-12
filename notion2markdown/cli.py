@@ -32,14 +32,16 @@ def main():
     only_download = args.only_download
     only_convert = args.only_convert
 
+    # prevent usage of --only-download and --only-convert at the same time
+    if only_download and only_convert:
+        raise ValueError("Cannot set both --only-download and --only-convert flags")
     if no_filter:
         filter = None
     else:
         filter = DEFAULT_FILTER
 
     exporter = NotionExporter(token=token, strip_meta_chars=strip_meta_chars, extension=extension, filter=filter)
-    if only_download and only_convert:
-        raise ValueError("Cannot set both --only-download and --only-convert flags")
+
     if only_download:
         path = exporter.download_json(url=args.url)
         logger.info(f"Downloaded to {path} directory")
