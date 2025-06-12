@@ -1,4 +1,6 @@
-from datetime import datetime
+from datetime import datetime, timedelta
+from ratelimit import limits, sleep_and_retry
+
 from pathlib import Path
 import json
 #  from itertools import chain
@@ -25,6 +27,8 @@ class NotionDownloader:
         else:
             self.download_database(slug, out_dir)
 
+    @sleep_and_retry
+    @limits(calls=3, period=timedelta(seconds=1).total_seconds())
     def download_page(self, page_id: str, out_path: Union[str, Path]='./json', fetch_metadata: bool=True):
         """Download the notion page."""
         out_path = Path(out_path)
@@ -91,6 +95,8 @@ class NotionClient:
         """Get page metadata as json."""
         return self.transformer.forward([self.client.pages.retrieve(page_id=page_id)])[0]
 
+    @sleep_and_retry
+    @limits(calls=3, period=timedelta(seconds=1).total_seconds())
     def get_blocks(self, block_id: int) -> List:
         """Get all page blocks as json. Recursively fetches descendants."""
         blocks = []
