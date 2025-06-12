@@ -9,6 +9,15 @@ class NotionExporter:
         self.downloader = NotionDownloader(token, filter)
         self.converter = JsonToMdConverter(strip_meta_chars=strip_meta_chars, extension=extension)
 
+    def download_json(self, url: str, json_dir: Union[str, Path]='./json', md_dir: Union[str, Path]='./md'):
+        """Only download the json for the notion page or database."""
+        self.downloader.download_url(url, json_dir)
+        return json_dir
+
+    def convert_json(self, url: str, json_dir: Union[str, Path]='./json', md_dir: Union[str, Path]='./md'):
+        """Only convert the json for the notion page or database."""
+        return self.converter.convert(json_dir, md_dir)
+
     def export_url(self, url: str, json_dir: Union[str, Path]='./json', md_dir: Union[str, Path]='./md'):
         """Export the notion page or database."""
         self.downloader.download_url(url, json_dir)

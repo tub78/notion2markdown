@@ -19,6 +19,8 @@ def main():
     parser.add_argument('--extension', type=str, help='The file extension to output', default="md")
     parser.add_argument('--strip-meta-chars', type=str, help='Strip characters from frontmatter')
     parser.add_argument('--no-filter', help='Filter for notion export', action="store_true")
+    parser.add_argument('--only-download', help='Stop after downloading json', action="store_true")
+    parser.add_argument('--only-convert', help='Skip downloading json', action="store_true")
     args = parser.parse_args()
 
     token = args.token or os.environ.get("NOTION_TOKEN")
@@ -27,6 +29,8 @@ def main():
     strip_meta_chars = args.strip_meta_chars
     extension = args.extension
     no_filter = args.no_filter
+    only_download = args.only_download
+    only_convert = args.only_convert
 
     if no_filter:
         filter = None
@@ -34,5 +38,15 @@ def main():
         filter = DEFAULT_FILTER
 
     exporter = NotionExporter(token=token, strip_meta_chars=strip_meta_chars, extension=extension, filter=filter)
+    if only_download and only_convert:
+        raise ValueError("Cannot set both --only-download and --only-convert flags")
+    if only_download:
+        path = exporter.download_json(url=args.url)
+        logger.info(f"Downloaded to {path} directory")
+        return
+    if only_convert:
+        path = exporter.convert_json(url=args.url)
+        logger.info(f"Converted to {path} directory")
+        return
     path = exporter.export_url(url=args.url)
     logger.info(f"Exported to {path} directory")
