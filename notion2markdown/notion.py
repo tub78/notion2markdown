@@ -96,7 +96,9 @@ class NotionClient:
         blocks = []
         for child in paginate(self.client.blocks.children.list, block_id=block_id):
             child["children"] = (
-                list(self.get_blocks(child["id"])) if child["has_children"] else []
+                list(self.get_blocks(child["id"]))
+                if child["has_children"] and child["type"] != "child_page"
+                else []
             )
             blocks.append(child)
         return list(self.transformer.forward(blocks))
