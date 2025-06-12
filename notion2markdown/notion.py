@@ -94,9 +94,6 @@ class NotionClient:
     def get_blocks(self, block_id: int) -> List:
         """Get all page blocks as json. Recursively fetches descendants."""
         blocks = []
-        #  for child in chain(
-        #      *paginate(self.client.blocks.children.list, block_id=block_id)
-        #  ):
         for child in paginate(self.client.blocks.children.list, block_id=block_id):
             child["children"] = (
                 list(self.get_blocks(child["id"])) if child["has_children"] else []
