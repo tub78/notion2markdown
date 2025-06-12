@@ -288,7 +288,7 @@ class JsonToMd:
         '<div></div>'
         """
         if isinstance(value, dict) and value.get("type", "") == "divider":
-            return "<div></div>"
+            return "---"
         return noop
 
     @rule
