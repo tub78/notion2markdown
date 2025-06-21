@@ -72,11 +72,19 @@ class JsonToMdConverter:
         except:
             pass
 
+
+        # create a mapping of page id to metadata, and determine
+        # title property key (which has "type" = "title")
+        title_property = ""
         with open(json_dir / "database.json") as fin:
             json_pages_db = json.load(fin)
             page_id_to_metadata = {
                 page["id"]: self.get_post_metadata(page) for page in json_pages_db
             }
+            for key, value in json_pages_db[0]["properties"].items():
+                if value.get("type", "") == "title":
+                    title_property = key
+                    break
 
         paths = [
             path for path in glob.glob(str(json_dir / "*.json"))
