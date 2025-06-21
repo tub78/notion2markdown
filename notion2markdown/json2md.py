@@ -73,8 +73,9 @@ class JsonToMdConverter:
             pass
 
         with open(json_dir / "database.json") as fin:
+            json_pages_db = json.load(fin)
             page_id_to_metadata = {
-                page["id"]: self.get_post_metadata(page) for page in json.load(fin)
+                page["id"]: self.get_post_metadata(page) for page in json_pages_db
             }
 
         paths = [
