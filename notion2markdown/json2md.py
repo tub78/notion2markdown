@@ -49,6 +49,8 @@ class JsonToMdConverter:
         md_dir = Path(md_dir)
         md_dir.mkdir(parents=True, exist_ok=True)
 
+        today_string = datetime.today().strftime("%Y-%m-%d")
+
         try: 
             # convert homepage
             in_path = json_dir / "homepage.json"
@@ -58,7 +60,6 @@ class JsonToMdConverter:
                 if not Path(out_path).exists() or Path(out_path).stat().st_mtime <= Path(in_path).stat().st_mtime:
                     with open(in_path) as fin:
                         blocks = json.load(fin)
-                        today_string = datetime.today().strftime("%Y-%m-%d")
                         metadata = {
                             "Last edited time": f"{today_string}",
                             "Verification": "pwFZ",
