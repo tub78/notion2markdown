@@ -86,6 +86,25 @@ class JsonToMdConverter:
                     title_property = key
                     break
 
+        # write index.md
+        index_path = md_dir / "index.md"
+        with open(index_path, "w", encoding='utf-8') as fout:
+            markdown = "---\n"
+            metadata = {
+                f"{title_property}": "index",
+                "Last edited time": f"{today_string}"
+            }                                
+            for key, value in metadata.items():
+                if value:
+                    markdown += f"{key}: {value}\n"
+            markdown += f"---\n\n"
+            fout.write(markdown)
+            for key, value in page_id_to_metadata.items():
+                if title := value.get(title_property, "Untitled"):
+                    fout.write(f"- [{title}]({key})\n")
+
+
+
         paths = [
             path for path in glob.glob(str(json_dir / "*.json"))
             if Path(path).name != "database.json"
