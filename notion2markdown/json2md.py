@@ -411,7 +411,7 @@ class JsonToMd:
             header = table[0]["table_row"]["cells"]
             lines.append(
                 "|"
-                + "|".join([self.json2md(cell[0]) if cell else '  ' for cell in header])
+                + "|".join([self.json2md(cell) if cell else '  ' for cell in header])
                 + "|"
             )
             lines.append("|" + "|".join(["---" for _ in header]) + "|")
@@ -419,7 +419,7 @@ class JsonToMd:
                 row = child["table_row"]["cells"]
                 lines.append(
                     "|"
-                    + "|".join([self.json2md(cell[0]) if cell else '  ' for cell in row])
+                    + "|".join([self.json2md(cell) if cell else '  ' for cell in row])
                     + "|"
                 )
             return "\n".join(lines)
